@@ -1,0 +1,75 @@
+let serial; 
+let item1;  //BOTTOM pot resizes YELLOW orb 
+let item2; //TOP pot resizes BLUE orb 
+//let circleColor = 255;
+
+let angle = 0   //design variable (rotate of orbs)
+let x = 0    //design variable 
+
+function setup() {
+  createCanvas(400, 400);
+  smooth(); //anti-alias drawing lines 
+  angleMode(DEGREES);
+  
+  serial = new p5.SerialPort(); //make new instance of SpLib
+  serial.on('data', serialEvent); //declare callback for when new data arrives
+  serial.open('/dev/tty.usbmodem14201'); //open the port
+}
+
+function draw() {
+  background(252, 219, 217);
+  //fill(circleColor); //fill depending on button
+  //ellipse(locH, locV, 50, 50);
+  
+  // BLUE Orb; Spinning around canvas origin b/c translate =  200,200
+  push();
+  translate(200,200); //shape translates around this (x,y) location
+  rotate(angle);
+  fill(158, 240, 214);
+  ellipse(100, 50, 50, item2); //item2 = Top pot 
+  angle = angle + 1
+  pop();
+  
+    
+ // Yellow Spinner  
+  push();
+  translate(150,330);
+  rotate(angle);
+  fill(252, 250, 194);
+  ellipseMode(CENTER);
+  ellipse(0,0,item1,70); //item1 = Bottom pot 
+  pop();
+  
+  
+  //RED 
+  // push();
+  // translate(x++,200);
+  // rotate(frameCount);
+  // fill('red');
+  // ellipseMode(CENTER);
+  // ellipse (5,5,50,100);
+  // pop();
+  
+}
+
+function serialEvent() {
+  let inString = serial.readLine();
+
+  if (inString.length > 0) {  //String really there?
+    //If so, split string into an array ('sensors') of substrings on the commas:
+    let sensors = split(inString, ',');
+    if (sensors.length > 1) {
+      
+      item1 = map(sensors[0], 30, 1023, 20, 300); //Element 0 is mapped to BOTTOM POT (yellow orb)
+      item2 = map(sensors[1], 30, 1023, 45, 140); //Element 1 is mapped to TOP POT (blue orb)
+      
+      //circleColor = 255 - (sensors[2] * 255);  //Element 2 is the button; When it’s 0, set the circleColor variable equal to 255 and when it’s 1, set the variable to 0. 
+
+      //convert the substrings into #s
+      //assign the #s to variables to change your program 
+      //bottom pot = x //top pot = y  
+
+    }
+
+  }
+}
